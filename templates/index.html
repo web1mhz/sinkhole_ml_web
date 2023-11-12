@@ -29,10 +29,10 @@
     </style>
 </head>
 <body>
-    <div class="container-lg mt-5">
+    <div class="container-lg mt-3">
 
         <!-- <h1 class="text-center text-bg-primary mb-4 ">서울특별시 씽크홀 발생위험 예측 </h1> -->
-        <img class="img-fluid h-75" src='{{url_for("static", filename="data/img_data/banner.png")}}' alt="">
+        <img class="img-fluid " style="height: 160px;" src='{{url_for("static", filename="data/img_data/banner_01.png")}}' alt="">
         
         <!-- <div class="row justify-content-center">
             <div class="col-md-6">
@@ -58,7 +58,6 @@
     </div> 
     
     <div class="container-fluid">
-
         <div class="row">
             <div class="col-md-6">
                 
@@ -70,18 +69,30 @@
                     <div id="chart"></div>    
             </div> 
         </div>
-
-
     </div>
-    
-   
-    
 
-    <div id="result" class = "text-center mt-5">
+    <div class="container-fluid mt-1">
+
+        <div class="card">
+            <div class="card-header" style="height: 50px;">
+                <p class="align-middle">예측 결과: 서울특별시 경계지도에서 마우스로 지점을 선택하세요.</p>
+            </div>
+            <div id="result" class="card-body" style="height: 80px;">
+              <!-- <blockquote class="blockquote mb-0"> -->
+                
+                <!-- <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer> -->
+              <!-- </blockquote> -->
+            </div>
+        </div> 
+
+    </div>   
+   
+
+    <!-- <div id="result" class = "text-center mt-5">        
         <h2>예측 결과</h2>
-        <p> 서울특별시 경계지도에서 마우스로 지점을 선택하세요.</p>
+        <p> </p>
     </div> 
-    
+     -->
 
     
     
@@ -154,13 +165,13 @@
                     console.log(response.results)
 
                     if (response.results !==null && response.results == "1등급"){                        
-                        $('#result').html('<div class="alert alert-danger" role="alert"><h2>선택된 지점은 씽크홀 발생위험 ' +  response.results +'<br>'+ '발생위험확률(' + response.pred_val + ')입니다.</h2></div>');
+                        $('#result').html('<div ><span class="badge badge-danger">위험</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                     } else if (response.results !==null && response.results == "2등급") {                       
-                        $('#result').html('<div class="alert alert-warning" role="alert"><h2>선택된 지점은 씽크홀 발생위험 ' +  response.results +'<br>'+ '발생위험확률(' + response.pred_val + ')입니다.</h2></div>');
+                        $('#result').html('<div ><span class="badge badge-warning">경고</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                     } else if (response.results !==null && response.results == "3등급"){
-                        $('#result').html('<div class="alert alert-secondary" role="alert"><h2>선택된 지점은 씽크홀 발생위험 ' +  response.results +'<br>'+ '발생위험확률(' + response.pred_val + ')입니다.</h2></div>');
+                        $('#result').html('<div ><span class="badge badge-info">주의</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                     } else {
-                        $('#result').html('<div class="alert alert-primary" role="alert"><h2>선택된 지점은 씽크홀 발생위험 안전지대 <br>'+ '발생위험확률(' + response.pred_val + ')입니다.</h2></div>');
+                        $('#result').html('<div ><span class="badge badge-success">관심</span><h3>선택된 지점은 씽크홀 발생위험 안전지대'+ '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                     }
 
                     // Check if chart_base64 is defined and not null
