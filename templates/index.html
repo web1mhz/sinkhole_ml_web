@@ -164,15 +164,22 @@
 
                     console.log(response.results)
 
+                    // if (response.results !==null && response.results == "out"){ 
+                    //     $('#result').html('<div ><h3>선택된 지점은 서울시 경게를 벗어났습니다.</h3></div>');
+                    // }
+
                     if (response.results !==null && response.results == "1등급"){                        
                         $('#result').html('<div ><span class="badge badge-danger">위험</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                     } else if (response.results !==null && response.results == "2등급") {                       
                         $('#result').html('<div ><span class="badge badge-warning">경고</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                     } else if (response.results !==null && response.results == "3등급"){
                         $('#result').html('<div ><span class="badge badge-info">주의</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
-                    } else {
+                    } else if (response.results !==null && response.results == "안전지대"){
                         $('#result').html('<div ><span class="badge badge-success">관심</span><h3>선택된 지점은 씽크홀 발생위험 안전지대'+ '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                    } else {
+                        $('#result').html('<div><h3>선택된 지점은 서울시 경계를 벗어났습니다.</h3></div>');
                     }
+
 
                     // Check if chart_base64 is defined and not null
                     // if (response.chart_base64 !== undefined && response.chart_base64 !== null) {

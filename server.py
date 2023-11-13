@@ -26,7 +26,7 @@ model_folder= 'static/data/model'
 load_model = joblib.load(f'{model_folder}/XGBClassifier.joblib')
 # load_model = joblib.load(f'{model_folder}/RandomForestClassifier.joblib')
 
-print(raster_file_paths)
+# print(raster_file_paths)
 
 def sns_hangul():
 
@@ -58,8 +58,8 @@ def process_coordinates():
     # Use coordinates to extract values from the raster file
     # values = extract_values_from_raster(lat, lon)
 
-    for raster_path in raster_file_paths:
-        print(raster_path)
+    # for raster_path in raster_file_paths:
+    #     print(raster_path)
 
     values = [extract_values_from_raster(lat, lon, raster_path) for raster_path in raster_file_paths]
 
@@ -67,28 +67,37 @@ def process_coordinates():
 
     print(values)
 
-    pred_val = model_predict(values, r_names)
-
-    pred_val1 = np.round(pred_val[0], 3)
-
-    str_val1 = str(pred_val1)
-
-    print('tg',str_val1)
-
-    if pred_val1 > 0.75:
-        pred_class = '1등급' 
-    elif pred_val1 > 0.50:
-        pred_class = '2등급'
-    elif pred_val1 > 0.25:
-        pred_class = '3등급'
+    pred_class = None
+    str_val1 = None
+    chart_base64 = None
+    
+    if any(value < 0 for value in values):
+        print("음수있음")
+        pred_class ="out" 
     else:
-        pred_class = '안전지대'  
+    
+        print("음수없음")
 
-    print(pred_class)
+        pred_val = model_predict(values, r_names)
 
-    # Create a bar chart and convert it to base64 for embedding in HTML
-    chart_img = create_bar_chart(r_names, values)
-    chart_base64 = base64.b64encode(chart_img.getvalue()).decode('utf-8')
+        pred_val1 = np.round(pred_val[0], 3)
+        str_val1 = str(pred_val1)
+        # print('tg',str_val1)
+
+        if pred_val1 > 0.75:
+            pred_class = '1등급' 
+        elif pred_val1 > 0.50:
+            pred_class = '2등급'
+        elif pred_val1 > 0.25:
+            pred_class = '3등급'
+        else:
+            pred_class = '안전지대'  
+
+        # print(pred_class)
+
+        # Create a bar chart and convert it to base64 for embedding in HTML
+        chart_img = create_bar_chart(r_names, values)
+        chart_base64 = base64.b64encode(chart_img.getvalue()).decode('utf-8')
 
     return jsonify({'chart_base64': chart_base64, 'results': pred_class, 'pred_val' :  str_val1})
 
@@ -120,10 +129,10 @@ def extract_values_from_raster(latitude, longitude, raster_path):
             return str(e)
 
 def model_predict(values, r_name):
-    print(values, r_name)
+    # print(values, r_name)
 
     x = np.array([values])
-    print(x)
+    # print(x)
     pred_result = load_model.predict_proba(x)
 
     pred_result1 = pred_result[:,-1]
@@ -143,7 +152,7 @@ def create_bar_chart(rnames, values):
 
     # Check if values is None
     for r_name in rnames:
-        print(r_name)
+        # print(r_name)
         if r_name == "hydrgeo_84":            
             values[rnames.index(r_name)] = values[rnames.index(r_name)] * 100
     
@@ -175,4 +184,4 @@ def create_bar_chart(rnames, values):
 
 if __name__ == '__main__': 
     app.secret_key = os.urandom(24)
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
