@@ -12,6 +12,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import matplotlib
+import requests
 
 import joblib
 
@@ -28,6 +29,11 @@ load_model = joblib.load(f'{model_folder}/XGBClassifier.joblib')
 
 # print(raster_file_paths)
 
+# 이미지를 저장할 디렉토리
+IMAGE_DIR = os.path.join(os.getcwd(), 'static', 'data/img_data')
+os.makedirs(IMAGE_DIR, exist_ok=True)
+
+
 def sns_hangul():
 
     print("# 한글 깨짐 방지")    
@@ -36,15 +42,12 @@ def sns_hangul():
     matplotlib.rc('font', family=font_name)
 
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/process_coordinates', methods=['POST'])
-def process_coordinates():
-
-   
+def process_coordinates():   
 
     # Get latitude and longitude from the request
     data = request.get_json()
@@ -53,56 +56,54 @@ def process_coordinates():
     lon = float(data['longitude']) 
     print("aa",lon, lat)   
 
-    # try:
+    try:   
 
-    # Use coordinates to extract values from the raster file
-    # values = extract_values_from_raster(lat, lon)
+        values = [extract_values_from_raster(lat, lon, raster_path) for raster_path in raster_file_paths]
 
-    # for raster_path in raster_file_paths:
-    #     print(raster_path)
+        r_names = [os.path.basename(raster_path).split('.')[0] for raster_path in raster_file_paths]
+        
+        print(values)
 
-    values = [extract_values_from_raster(lat, lon, raster_path) for raster_path in raster_file_paths]
+        pred_class = None
+        str_val1 = None
+        chart_base64 = None
 
-    r_names = [os.path.basename(raster_path).split('.')[0] for raster_path in raster_file_paths]  
-
-    print(values)
-
-    pred_class = None
-    str_val1 = None
-    chart_base64 = None
     
-    if any(value < 0 for value in values):
-        print("음수있음")
-        pred_class ="out" 
-    else:
-    
-        print("음수없음")
 
-        pred_val = model_predict(values, r_names)
+        if any(value < 0 for value in values) :
 
-        pred_val1 = np.round(pred_val[0], 3)
-        str_val1 = str(pred_val1)
-        # print('tg',str_val1)
-
-        if pred_val1 > 0.75:
-            pred_class = '1등급' 
-        elif pred_val1 > 0.50:
-            pred_class = '2등급'
-        elif pred_val1 > 0.25:
-            pred_class = '3등급'
+            print("음수있음")
+            pred_class ="out"
+            
         else:
-            pred_class = '안전지대'  
+        
+            print("음수없음")
 
-        # print(pred_class)
+            pred_val = model_predict(values, r_names)
 
-        # Create a bar chart and convert it to base64 for embedding in HTML
-        chart_img = create_bar_chart(r_names, values)
-        chart_base64 = base64.b64encode(chart_img.getvalue()).decode('utf-8')
+            pred_val1 = np.round(pred_val[0], 3)
+            str_val1 = str(pred_val1)
+            # print('tg',str_val1)
 
-    return jsonify({'chart_base64': chart_base64, 'results': pred_class, 'pred_val' :  str_val1})
+            if pred_val1 > 0.75:
+                pred_class = '1등급' 
+            elif pred_val1 > 0.50:
+                pred_class = '2등급'
+            elif pred_val1 > 0.25:
+                pred_class = '3등급'
+            else:
+                pred_class = '안전지대'  
 
-    # except Exception as e:
-    #     return jsonify({'error': str(e)})
+            # print(pred_class)
+
+            # Create a bar chart and convert it to base64 for embedding in HTML
+            chart_img = create_bar_chart(r_names, values)
+            chart_base64 = base64.b64encode(chart_img.getvalue()).decode('utf-8')
+
+        return jsonify({'chart_base64': chart_base64, 'results': pred_class, 'pred_val' :  str_val1})
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 def extract_values_from_raster(latitude, longitude, raster_path):
     # Open the raster file using rasterio
@@ -139,20 +140,28 @@ def model_predict(values, r_name):
 
     return pred_result1 
    
-    
+def generate_and_save_plot():
+    # Seaborn 그래프 생성
+    data = sns.load_dataset("iris")
+    sns_plot = sns.pairplot(data, hue="species")
+
+    # 그래프를 이미지로 변환
+    image_stream = BytesIO()
+    sns_plot.figure.savefig(image_stream, format='png')
+    image_stream.seek(0)
+
+    # 이미지를 저장
+    image_path = os.path.join(IMAGE_DIR, 'seaborn_plot.png')
+    sns_plot.figure.savefig(image_path, format='png')
+
+    return image_path   
 
 def create_bar_chart(rnames, values): 
 
-    font_location = 'C:/Windows/Fonts/MALGUN.TTF' # For Windows
-    font_name = fm.FontProperties(fname=font_location).get_name()
-    matplotlib.rc('font', family=font_name) 
-
-    rnames_ed =[name.split("_")[0]  for name in rnames]
-    
+    rnames_ed =[name.split("_")[0]  for name in rnames]   
 
     # Check if values is None
     for r_name in rnames:
-        # print(r_name)
         if r_name == "hydrgeo_84":            
             values[rnames.index(r_name)] = values[rnames.index(r_name)] * 100
     
@@ -160,26 +169,25 @@ def create_bar_chart(rnames, values):
         # Return an empty BytesIO object
         return BytesIO()
     
-    # print("c", values)
-
     # Create a bar chart using seaborn
     sns.set(style="whitegrid")
-    plt.figure(figsize=(7.3, 5))
-    sns.barplot(x=values, y=rnames_ed, palette="viridis")
-    # ax.set(xlabel='Raster', ylabel='Value', title='Raster values from selected coordinates') 
-
+    plt.figure(figsize=(8, 5))
+    sns_plot = sns.barplot(x=values, y=rnames_ed, palette="viridis")    
     
-
     plt.title('Raster values from selected coordinates.')
     plt.ylabel('Envrionmenal Variables')
     plt.xlabel('Value')
 
     # Save the chart to a BytesIO object
-    img = BytesIO()    
+    img = BytesIO() 
+    
     plt.savefig(img, format='png') 
     img.seek(0)
-    plt.close()
 
+    # 이미지를 저장
+    image_path = os.path.join(IMAGE_DIR, 'barplot_plot.png')
+    sns_plot.figure.savefig(image_path, format='png') 
+    plt.close()
     return img
 
 if __name__ == '__main__': 

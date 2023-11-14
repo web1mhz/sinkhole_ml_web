@@ -5,27 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raster Data Visualization</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='data/css/style.css')}}">
 
     <style> 
 
-    *{
-        padding:0;
-        margin:0;
-        box-sizing: border-box;
-    }
-
-    body {
+    
+    .backg {
                 
                 width: 100%;
-                height:100vh;
-                background: linear-gradient(rgba(0,0,0, 0.3), rgba(0,0,0,0.3)), url('{{url_for("static", filename="data/img_data/sinkhole_img.jpeg")}}');                
-                background-size: cover; /* 이미지를 커버하도록 설정 */
-                background-position: center; /* 이미지를 가운데 정렬 */
-                background-repeat: no-repeat; /* 이미지 반복 없음 */
-                background-attachment: fixed;
-                
-    }    
+                height:500px;
+                background-image: linear-gradient(rgba(0,0,0, 0.3), rgba(0,0,0,0.3)), url('../static/data/img_data/sinkhole_img.jpeg');                
+                background-size: cover;
+                background-position: center; 
+                background-repeat: no-repeat;                                 
+        }    
+        
 
+    
     </style>
 </head>
 <body>
@@ -54,66 +50,78 @@
             <div class="col-md-8">
                 <div id="chartContainer" class="text-center"></div>
             </div>
-        </div>    -->
-    </div> 
-    
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6">
-                
-                    <div id="map" style="width: 100%; height: 500px;"></div>            
-                         
-            </div>
-            <div class="col-md-6">    
-    
-                    <div id="chart"></div>    
-            </div> 
-        </div>
-    </div>
-
-    <div class="container-fluid mt-1">
-
-        <div class="card">
-            <div class="card-header" style="height: 50px;">
-                <p class="align-middle">예측 결과: 서울특별시 경계지도에서 마우스로 지점을 선택하세요.</p>
-            </div>
-            <div id="result" class="card-body" style="height: 80px;">
-              <!-- <blockquote class="blockquote mb-0"> -->
-                
-                <!-- <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer> -->
-              <!-- </blockquote> -->
-            </div>
         </div> 
-
-    </div>   
-   
-
-    <!-- <div id="result" class = "text-center mt-5">        
-        <h2>예측 결과</h2>
-        <p> </p>
-    </div> 
      -->
+        
+    </div> 
+    <section class="text-center">
+        <div class="container-fluid">
+            <div class="row d-flex justify-content-center">
+                
+                <div class="col-md-6">
+                    
+                        <div id="map" class="img-fluid" style="width: 100%; height: 500px;"></div>     
+                </div>
+                <div class="col-md-6">           
+                        <div id="chart" class="backg" ></div>    
+                </div> 
+                
+            </div>
+
+            <div class="card mt-1">
+                <div class="card-header" style="height: 50px;">
+                    <p class="align-middle">예측 결과: 서울특별시 경계지도에서 마우스로 지점을 선택하세요.</p>
+                </div>
+
+                <button  id="loading" class="btn btn-warning" type="button" disabled style="display: none;">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    PREDICTING...
+                </button>
+
+                <div id ="coord"></div>  
+                <div id="result" class="card-body" style="height: 120px;">    
+                </div>
+                              
+            </div> 
+        </div>   
+    </section>
+    <section>
+
+        
+        
+
+    </section>
+
+    <!-- # 네이버 지도 API 설정S
+        CLIENT_ID = 'o5tt3la65'
+        CLIENT_SECRET = 'dZTSfdZx45UGPO7igt6IRAiAVZmqbifYwsh23Vey'
+        NAVER_MAP_API_URL = 'https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc'
+
+        headers = {
+            'X-Naver-Client-Id': CLIENT_ID,
+            'X-Naver-Client-Secret': CLIENT_SECRET,
+        } -->
 
     
-    
-
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 
     <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=o5tt3la65w&callback=initMap&submodules=visualization"></script>
+    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=o5tt3la65w&submodules=geocoder"></script>
+    
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+       
+   
     <script>
 
-    var mapOptions = {
+         var mapOptions = {
 
             // naver.maps.MapTypeId.NORMAL: 일반 지도 (기본값)
             // naver.maps.MapTypeId.HYBRID: 하이브리드 지도 (위성 사진과 지도 데이터 결합)
             // naver.maps.MapTypeId.SATELLITE: 위성 지도 (실제 위성 사진)
             // naver.maps.MapTypeId.TERRAIN: 지형 지도 (지형 정보 표시)
-
-
             zoom: 11,
             mapTypeId: 'normal',
             center: new naver.maps.LatLng(37.5665, 126.9780),
@@ -141,18 +149,29 @@
             }
         };
 
-        const map = new naver.maps.Map('map', mapOptions);
 
-        // var map = new naver.maps.Map(document.getElementById('map'), mapOptions);
-       
+        const map = new naver.maps.Map('map', mapOptions);
 
         // Add click event listener to the map
         naver.maps.Event.addListener(map, 'click', function (e) {
-            // Get the clicked coordinates
-            var latitude = e.latlng.lat();
-            var longitude = e.latlng.lng();
 
-            console.log(e.coord)
+            
+            map.setCenter(e.coord);
+            map.setZoom(12, true);
+
+            
+            infoWindow.close();
+            $('#coord').html("")
+            $('#result').html("")
+
+            $("#loading").show();
+
+
+            // Get the clicked coordinates
+            var latitude = e.coord.lat();
+            var longitude = e.coord.lng();      
+            
+            
 
             // Send coordinates to the server
             $.ajax({
@@ -160,24 +179,23 @@
                 type: 'POST',
                 contentType: 'application/json;charset=UTF-8',
                 data: JSON.stringify({'latitude': latitude, 'longitude': longitude}),
+                
                 success: function(response) {
+
+                    $("#loading").hide();
 
                     console.log(response.results)
 
-                    // if (response.results !==null && response.results == "out"){ 
-                    //     $('#result').html('<div ><h3>선택된 지점은 서울시 경게를 벗어났습니다.</h3></div>');
-                    // }
-
                     if (response.results !==null && response.results == "1등급"){                        
-                        $('#result').html('<div ><span class="badge badge-danger">위험</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                        $('#result').html('<div ><span class="badge badge-danger">위험</span><h3>씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                     } else if (response.results !==null && response.results == "2등급") {                       
-                        $('#result').html('<div ><span class="badge badge-warning">경고</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                        $('#result').html('<div ><span class="badge badge-warning">경고</span><h3>씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                     } else if (response.results !==null && response.results == "3등급"){
-                        $('#result').html('<div ><span class="badge badge-info">주의</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                        $('#result').html('<div ><span class="badge badge-info">주의</span><h3>씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                     } else if (response.results !==null && response.results == "안전지대"){
-                        $('#result').html('<div ><span class="badge badge-success">관심</span><h3>선택된 지점은 씽크홀 발생위험 안전지대'+ '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                        $('#result').html('<div ><span class="badge badge-success">관심</span><h3>씽크홀 발생위험 안전지대'+ '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                     } else {
-                        $('#result').html('<div><h3>선택된 지점은 서울시 경계를 벗어났습니다.</h3></div>');
+                        $('#result').html('<div><h3>선택한 지점은 서울시 경계를 벗어났거나 한강입니다. 다시 선택하세요.</h3></div>');
                     }
 
 
@@ -185,11 +203,19 @@
                     // if (response.chart_base64 !== undefined && response.chart_base64 !== null) {
                     if (response.chart_img !== null) {
                         // Display the result on the page
-                        $('#chart').html('<img src="data:image/png;base64,' + response.chart_base64 + '" alt="Bar Chart">');
+                        $('#chart').html('<img src="data:image/png;base64,' + response.chart_base64 + '" alt="Bar Chart" class="img-fluid">');
+                        
                     } else {
                         // Handle the case where chart_base64 is undefined or null                       
                         $('#chart').html('<p>선택된 지점은 서울특별시 경계를 벗어났습니다. 다시 선택하세요.</p>');
                     }
+
+                    $('#coord').html('<div style-"padding:10;"><h3>선택된 지점은 경도: '+  longitude + ' 위도: ' +  latitude +'</h3></div>');
+                    
+                    console.log(e.coord)
+                    searchCoordinateToAddress(e.coord);
+
+                    
                 }
             });
         });
@@ -203,7 +229,7 @@
         });
         
         function startDataLayer(geojson) {   
-            map.data.addGeoJson(geojson);           
+            map.data.addGeoJson(geojson);          
         }
 
 
@@ -251,25 +277,142 @@
         //map.fitBounds(seoul); // 좌표 경계 이동
         // map.panBy(new naver.maps.Point(10, 10)); // 오른쪽 아래로 10 픽셀 이동
 
-
-         // 로딩화면 표시
-        $(document).ajaxStart(function () {
-            $('#loadingBar').show();
+        ///////////////////좌표로 주소로 변환하는 코드///////////////////////////////     
+        
+        var infoWindow = new naver.maps.InfoWindow({
+            anchorSkew: true
         });
 
-        // $(document).ajaxStop(function () {
-        //     $('#loadingBar').hide();
-        // });
+        map.setCursor('pointer');      
+        
+        
+        // naver.maps.Service.reverseGeocode({
+        // coords: new naver.maps.LatLng(37.3595316, 127.1052133),
+        // }, function(status, response) {
+        //     if (status !== naver.maps.Service.Status.OK) {
+        //         return alert('Something wrong!');
+        //     }
 
-        // 로딩화면 종료
+        //     var result = response.v2, // 검색 결과의 컨테이너
+        //         items = result.results, // 검색 결과의 배열
+        //         address = result.address; // 검색 결과로 만든 주소
+
+        //     // do Something
+        // });        
+
+        function searchCoordinateToAddress(latlng) {
+
+            infoWindow.close();
+
+            naver.maps.Service.reverseGeocode({
+                coords: latlng,
+                orders: [
+                    naver.maps.Service.OrderType.ADDR,
+                    naver.maps.Service.OrderType.ROAD_ADDR
+                ].join(',')
+            }, function(status, response) {
+                if (status === naver.maps.Service.Status.ERROR) {
+                    return alert('Something Wrong!');
+                }
+
+                var items = response.v2.results,
+                    address = '',
+                    htmlAddresses = [];
+
+                for (var i=0, ii=items.length, item, addrType; i<ii; i++) {
+                    item = items[i];
+                    address = makeAddress(item) || '';
+                    addrType = item.name === 'roadaddr' ? '[도로명 주소]' : '[지번 주소]';
+
+                    htmlAddresses.push((i+1) +'. '+ addrType +' '+ address);
+                }
+
+                infoWindow.setContent([
+                    '<div style="padding:5px;min-width:100px;line-height:100%;">',
+                    '<h6 style="margin-top:1px;">검색 좌표</h6><br />',
+                    htmlAddresses.join('<br />'),
+                    '</div>'
+                ].join('\n'));
+
+                infoWindow.open(map, latlng);
+            });
+        }
+
+        function makeAddress(item) {
+            if (!item) {
+                return;
+            }
+
+            var name = item.name,
+                region = item.region,
+                land = item.land,
+                isRoadAddress = name === 'roadaddr';
+
+            var sido = '', sigugun = '', dongmyun = '', ri = '', rest = '';
+
+            if (hasArea(region.area1)) {
+                sido = region.area1.name;
+            }
+
+            if (hasArea(region.area2)) {
+                sigugun = region.area2.name;
+            }
+
+            if (hasArea(region.area3)) {
+                dongmyun = region.area3.name;
+            }
+
+            if (hasArea(region.area4)) {
+                ri = region.area4.name;
+            }
+
+            if (land) {
+                if (hasData(land.number1)) {
+                    if (hasData(land.type) && land.type === '2') {
+                        rest += '산';
+                    }
+
+                    rest += land.number1;
+
+                    if (hasData(land.number2)) {
+                        rest += ('-' + land.number2);
+                    }
+                }
+
+                if (isRoadAddress === true) {
+                    if (checkLastString(dongmyun, '면')) {
+                        ri = land.name;
+                    } else {
+                        dongmyun = land.name;
+                        ri = '';
+                    }
+
+                    if (hasAddition(land.addition0)) {
+                        rest += ' ' + land.addition0.value;
+                    }
+                }
+            }
+
+            return [sido, sigugun, dongmyun, ri, rest].join(' ');
+        }
 
 
-       
-       
+        function hasArea(area) {
+                return !!(area && area.name && area.name !== '');
+            }
 
+            function hasData(data) {
+                return !!(data && data !== '');
+            }
+
+            function checkLastString (word, lastString) {
+                return new RegExp(lastString + '$').test(word);
+            }
+
+            function hasAddition (addition) {
+                return !!(addition && addition.value);
+        }
     
     </script>
 </body>
 </html>
-
-

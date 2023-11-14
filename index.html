@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raster Data Visualization</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style> 
+
+    *{
+        padding:0;
+        margin:0;
+        box-sizing: border-box;
+    }
+
+    body {
+                
+                width: 100%;
+                height:100vh;
+                background: linear-gradient(rgba(0,0,0, 0.3), rgba(0,0,0,0.3)), url('{{url_for("static", filename="data/img_data/sinkhole_img.jpeg")}}');                
+                background-size: cover; /* 이미지를 커버하도록 설정 */
+                background-position: center; /* 이미지를 가운데 정렬 */
+                background-repeat: no-repeat; /* 이미지 반복 없음 */
+                background-attachment: fixed;
+                
+    }    
+
+    </style>
+</head>
+<body>
+    <div class="container-lg mt-3">
+
+        <!-- <h1 class="text-center text-bg-primary mb-4 ">서울특별시 씽크홀 발생위험 예측 </h1> -->
+        <img class="img-fluid " style="height: 160px;" src='{{url_for("static", filename="data/img_data/banner_01.png")}}' alt="">
+        
+        <!-- <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form id="coordinatesForm" class="form-inline justify-content-center">
+                    <div class="form-group mb-2">
+                        <label for="latitude" class="sr-only">Latitude</label>
+                        <input type="text" class="form-control" id="latitude" placeholder="Latitude" required>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="longitude" class="sr-only">Longitude</label>
+                        <input type="text" class="form-control" id="longitude" placeholder="Longitude" required>
+                    </div>
+                    <button type="button" class="btn btn-primary mb-2" onclick="processCoordiㄴnates()">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row mt-4 justify-content-center">
+            <div class="col-md-8">
+                <div id="chartContainer" class="text-center"></div>
+            </div>
+        </div>    -->
+    </div> 
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                
+                    <div id="map" style="width: 100%; height: 500px;"></div>            
+                         
+            </div>
+            <div class="col-md-6">    
+    
+                    <div id="chart"></div>    
+            </div> 
+        </div>
+    </div>
+
+    <div class="container-fluid mt-1">
+
+        <div class="card">
+            <div class="card-header" style="height: 50px;">
+                <p class="align-middle">예측 결과: 서울특별시 경계지도에서 마우스로 지점을 선택하세요.</p>
+            </div>
+            <div id="result" class="card-body" style="height: 80px;">
+              <!-- <blockquote class="blockquote mb-0"> -->
+                
+                <!-- <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer> -->
+              <!-- </blockquote> -->
+            </div>
+        </div> 
+
+    </div>   
+   
+
+    <!-- <div id="result" class = "text-center mt-5">        
+        <h2>예측 결과</h2>
+        <p> </p>
+    </div> 
+     -->
+
+    
+    
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=o5tt3la65w&callback=initMap&submodules=visualization"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+
+    var mapOptions = {
+
+            // naver.maps.MapTypeId.NORMAL: 일반 지도 (기본값)
+            // naver.maps.MapTypeId.HYBRID: 하이브리드 지도 (위성 사진과 지도 데이터 결합)
+            // naver.maps.MapTypeId.SATELLITE: 위성 지도 (실제 위성 사진)
+            // naver.maps.MapTypeId.TERRAIN: 지형 지도 (지형 정보 표시)
+
+
+            zoom: 11,
+            mapTypeId: 'normal',
+            center: new naver.maps.LatLng(37.5665, 126.9780),
+            mapTypeControl: true,
+            mapTypeControlOptions: {
+                style: naver.maps.MapTypeControlStyle.BUTTON,
+                position: naver.maps.Position.TOP_RIGHT
+            },
+            zoomControl: true,
+            zoomControlOptions: {
+                style: naver.maps.ZoomControlStyle.SMALL,
+                position: naver.maps.Position.TOP_RIGHT
+            },
+            scaleControl: true,
+            scaleControlOptions: {
+                position: naver.maps.Position.RIGHT_CENTER
+            },
+            logoControl: true,
+            logoControlOptions: {
+                position: naver.maps.Position.TOP_LEFT
+            },
+            mapDataControl: true,
+            mapDataControlOptions: {
+                position: naver.maps.Position.BOTTOM_LEFT
+            }
+        };
+
+        const map = new naver.maps.Map('map', mapOptions);
+
+        // var map = new naver.maps.Map(document.getElementById('map'), mapOptions);
+       
+
+        // Add click event listener to the map
+        naver.maps.Event.addListener(map, 'click', function (e) {
+            // Get the clicked coordinates
+            var latitude = e.latlng.lat();
+            var longitude = e.latlng.lng();
+
+            console.log(e.coord)
+
+            // Send coordinates to the server
+            $.ajax({
+                url: '/process_coordinates',
+                type: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({'latitude': latitude, 'longitude': longitude}),
+                success: function(response) {
+
+                    console.log(response.results)
+
+                    if (response.results !==null && response.results == "1등급"){                        
+                        $('#result').html('<div ><span class="badge badge-danger">위험</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                    } else if (response.results !==null && response.results == "2등급") {                       
+                        $('#result').html('<div ><span class="badge badge-warning">경고</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                    } else if (response.results !==null && response.results == "3등급"){
+                        $('#result').html('<div ><span class="badge badge-info">주의</span><h3>선택된 지점은 씽크홀 발생위험 ' +  response.results + '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                    } else {
+                        $('#result').html('<div ><span class="badge badge-success">관심</span><h3>선택된 지점은 씽크홀 발생위험 안전지대'+ '발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                    }
+
+                    // Check if chart_base64 is defined and not null
+                    // if (response.chart_base64 !== undefined && response.chart_base64 !== null) {
+                    if (response.chart_img !== null) {
+                        // Display the result on the page
+                        $('#chart').html('<img src="data:image/png;base64,' + response.chart_base64 + '" alt="Bar Chart">');
+                    } else {
+                        // Handle the case where chart_base64 is undefined or null                       
+                        $('#chart').html('<p>선택된 지점은 서울특별시 경계를 벗어났습니다. 다시 선택하세요.</p>');
+                    }
+                }
+            });
+        });
+
+        naver.maps.Event.once(map, 'init', function () {
+        $.ajax({
+                url: 'static/data/json_data/seoul_bnd.json',
+                dataType: 'json',
+                success: startDataLayer
+            });
+        });
+        
+        function startDataLayer(geojson) {   
+            map.data.addGeoJson(geojson);           
+        }
+
+
+        naver.maps.Event.once(map, 'init_stylemap', function () {
+            $.ajax({
+                url: 'static/data/json_data/sinkhole_219.json',
+                dataType: 'json',
+                success: startHeatMap
+            });
+        });       
+
+        function startHeatMap(data) {
+
+            var position_data = []
+
+            // console.log(data.features.length)
+
+            for (let i = 0; i < data.features.length; i++) {
+                console.log(data.features[i].geometry.coordinates)
+
+
+                const 경도 = data.features[i].geometry.coordinates[0];
+                const 위도 = data.features[i].geometry.coordinates[1];
+
+                console.log(위도, 경도)
+
+                position_data.push(
+                    new naver.maps.LatLng(위도, 경도) 
+                )          
+
+            }  
+            
+            console.log(position_data)
+
+            var heatmap = new naver.maps.visualization.HeatMap({
+                map: map,
+                data: position_data
+            });
+        }
+
+        var seoul = new naver.maps.LatLngBounds(
+        new naver.maps.LatLng(37.42829747263545, 126.76620435615891),
+        new naver.maps.LatLng(37.7010174173061, 127.18379493229875));
+
+        //map.fitBounds(seoul); // 좌표 경계 이동
+        // map.panBy(new naver.maps.Point(10, 10)); // 오른쪽 아래로 10 픽셀 이동
+
+
+         // 로딩화면 표시
+        $(document).ajaxStart(function () {
+            $('#loadingBar').show();
+        });
+
+        // $(document).ajaxStop(function () {
+        //     $('#loadingBar').hide();
+        // });
+
+        // 로딩화면 종료
+
+
+       
+       
+
+    
+    </script>
+</body>
+</html>
+
+
