@@ -193,3 +193,4 @@ def create_bar_chart(rnames, values):
 if __name__ == '__main__': 
     app.secret_key = os.urandom(24)
     app.run(host="0.0.0.0", port=5000, debug=True)
+    # app.run(host="0.0.0.0", port=9006)
