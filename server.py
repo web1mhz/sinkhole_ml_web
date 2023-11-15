@@ -27,7 +27,6 @@ model_folder= 'static/data/model'
 load_model = joblib.load(f'{model_folder}/XGBClassifier.joblib')
 # load_model = joblib.load(f'{model_folder}/RandomForestClassifier.joblib')
 
-# print(raster_file_paths)
 
 # 이미지를 저장할 디렉토리
 IMAGE_DIR = os.path.join(os.getcwd(), 'static', 'data/img_data')
@@ -67,7 +66,6 @@ def process_coordinates():
         pred_class = None
         str_val1 = None
         chart_base64 = None
-
     
 
         if any(value < 0 for value in values) :
@@ -114,7 +112,6 @@ def extract_values_from_raster(latitude, longitude, raster_path):
         data = src.read(1) 
 
         try:
-
             x_index, y_index = src.index(longitude,latitude)
             values= data[x_index, y_index]
 
@@ -192,5 +189,13 @@ def create_bar_chart(rnames, values):
 
 if __name__ == '__main__': 
     app.secret_key = os.urandom(24)
-    app.run(host="0.0.0.0", port=5000, debug=True)
+
+    # 개발할 때
+    app.run(host="0.0.0.0", port=5000, debug=True) 
+
+    # tgkim 계정을 이용할 때
+    # app.run(host="0.0.0.0", port=9007)
+
+    # web1mhz 계정을 이용할 때
     # app.run(host="0.0.0.0", port=9006)
+    

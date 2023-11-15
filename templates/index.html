@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="{{url_for('static', filename='data/css/style.css')}}">
 
     <style> 
-
     
     .backg {
                 
@@ -18,7 +17,7 @@
                 background-size: cover;
                 background-position: center; 
                 background-repeat: no-repeat;                                 
-        }    
+        } 
           
     </style>
     
@@ -112,21 +111,7 @@
     </section>
     <section>
 
-        
-        
-
     </section>
-
-    <!-- # 네이버 지도 API 설정S
-        CLIENT_ID = 'o5tt3la65'
-        CLIENT_SECRET = 'dZTSfdZx45UGPO7igt6IRAiAVZmqbifYwsh23Vey'
-        NAVER_MAP_API_URL = 'https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc'
-
-        headers = {
-            'X-Naver-Client-Id': CLIENT_ID,
-            'X-Naver-Client-Secret': CLIENT_SECRET,
-        } -->
-
     
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -185,13 +170,10 @@
             map.setCenter(e.coord);
             map.setZoom(12, true);
 
-            
             infoWindow.close();
             $('#coord').html("")
             $('#result').html("")
-            $("#loading").show();
-
-            
+            $("#loading").show();            
           
             
             $("#latitude").val(""); 
@@ -206,8 +188,7 @@
             var longitude = e.coord.lng();     
             
             
-            predictResults(latitude, longitude);
-            
+            predictResults(latitude, longitude);            
             
 
             // Send coordinates to the server
@@ -258,7 +239,7 @@
         });     
 
 
-        // 버튼 클릭해서 예측하기 결과 가져외기
+        // 버튼 클릭해서 예측 결과 가져외기
         function predictResults(latitude, longitude){
 
             infoWindow.close();
@@ -374,7 +355,6 @@
         }
 
         // 서울시 경계로 네이버 지도 영역 설정
-
         var seoul = new naver.maps.LatLngBounds(
         new naver.maps.LatLng(37.42829747263545, 126.76620435615891),
         new naver.maps.LatLng(37.7010174173061, 127.18379493229875));
