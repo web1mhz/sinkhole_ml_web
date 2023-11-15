@@ -12,7 +12,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import matplotlib
-import requests
+
+# serWarning: Starting a Matplotlib GUI outside of the main thread will likely fail. 아래 코드로 해결
+matplotlib.use('agg')
 
 import joblib
 
@@ -53,7 +55,7 @@ def process_coordinates():
 
     lat = float(data['latitude'])
     lon = float(data['longitude']) 
-    print("aa",lon, lat)   
+    # print("aa",lon, lat)   
 
     try:   
 
@@ -61,7 +63,7 @@ def process_coordinates():
 
         r_names = [os.path.basename(raster_path).split('.')[0] for raster_path in raster_file_paths]
         
-        print(values)
+        # print(values)
 
         pred_class = None
         str_val1 = None
@@ -70,12 +72,12 @@ def process_coordinates():
 
         if any(value < 0 for value in values) :
 
-            print("음수있음")
+            # print("음수있음")
             pred_class ="out"
             
         else:
         
-            print("음수없음")
+            # print("음수없음")
 
             pred_val = model_predict(values, r_names)
 
