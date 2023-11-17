@@ -93,7 +93,7 @@
             </div>
 
             <div class="card mt-1">
-                <div class="card-header" style="height: 50px;">
+                <div class="card-header myfont" style="height: 50px;">
                     <p class="align-middle">예측 결과: 서울특별시 경계지도에서 마우스로 지점을 선택하세요.</p>
                 </div>
 
@@ -110,6 +110,10 @@
         </div>   
     </section>
     <section>
+        
+        <div class="text-center">
+            <canvas id="myChart"></canvas>
+        </div>
 
     </section>
     
@@ -125,7 +129,12 @@
 
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=fd75ba522e33309748e416861c65feef&libraries=services"></script>    
     <script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+
+        var chart_env_name = "";
+        var chart_env_val="";
 
          var mapOptions = {
 
@@ -261,7 +270,15 @@
 
                         $("#loading").hide();
 
-                        console.log(response.results)
+                        console.log(response.results);
+                        console.log(response.env_name);
+                        console.log(response.env_val);
+                       
+
+                        myChart.data.labels = response.env_name;
+                        myChart.data.datasets[0].data = response.env_val;
+
+                        
 
                         if (response.results !==null && response.results == "1등급"){                        
                             $('#result').html('<div ><span class="badge badge-danger">위험</span><h3>씽크홀 발생위험 ' +  response.results + ', 발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
@@ -290,9 +307,10 @@
                         $('#coord').html('<div style-"padding:10;"><h3>선택된 지점은 경도: '+  longitude + ' 위도: ' +  latitude +'</h3></div>');
                         
                         // console.log(e.coord)
-                        e_coord=new naver.maps.LatLng(latitude, longitude)
+                        e_coord=new naver.maps.LatLng(latitude, longitude);
                         searchCoordinateToAddress(e_coord);
 
+                        myChart.update();
                         
                     }
                 });
@@ -671,8 +689,42 @@
             }).open();
         }
 
-        naver.maps.onJSContentLoaded = initGeocoder;
-    
+        naver.maps.onJSContentLoaded = initGeocoder;    
     </script>
+
+   
+
+    <script>
+
+    
+
+    const ctx = document.getElementById('myChart');        
+
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+        labels: chart_env_name,
+        datasets: [{
+            label: '# of Votes',
+            data: chart_env_val,
+            borderWidth: 1
+        }]
+        },
+        options: {
+
+            indexAxis: 'y',
+        scales: {
+            y: {
+            beginAtZero: true
+            },
+                    }
+        }
+    });
+
+      
+
+    </script>
+
+
 </body>
 </html>

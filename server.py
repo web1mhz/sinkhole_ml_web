@@ -61,9 +61,11 @@ def process_coordinates():
 
         values = [extract_values_from_raster(lat, lon, raster_path) for raster_path in raster_file_paths]
 
+        
+
         r_names = [os.path.basename(raster_path).split('.')[0] for raster_path in raster_file_paths]
         
-        # print(values)
+        print(values)
 
         pred_class = None
         str_val1 = None
@@ -100,7 +102,7 @@ def process_coordinates():
             chart_img = create_bar_chart(r_names, values)
             chart_base64 = base64.b64encode(chart_img.getvalue()).decode('utf-8')
 
-        return jsonify({'chart_base64': chart_base64, 'results': pred_class, 'pred_val' :  str_val1})
+        return jsonify({'chart_base64': chart_base64, 'results': pred_class, 'pred_val' :  str_val1, 'env_name':r_names, 'env_val':values})
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -153,7 +155,7 @@ def generate_and_save_plot():
     image_path = os.path.join(IMAGE_DIR, 'seaborn_plot.png')
     sns_plot.figure.savefig(image_path, format='png')
 
-    return image_path   
+    return image_path    
 
 def create_bar_chart(rnames, values): 
 
