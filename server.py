@@ -57,15 +57,26 @@ def process_coordinates():
     lon = float(data['longitude']) 
     # print("aa",lon, lat)   
 
+    ko_env_name =[]
+
     try:   
 
-        values = [extract_values_from_raster(lat, lon, raster_path) for raster_path in raster_file_paths]
+        values = [extract_values_from_raster(lat, lon, raster_path) for raster_path in raster_file_paths] 
+        print(values)       
+
+        r_names = [os.path.basename(raster_path).split('.')[0].split('_')[0] for raster_path in raster_file_paths]
+
+        for r_name in r_names:
+            print(r_name)
+            
+            if r_name == "hydrgeo_84": 
+                ko_env_name.append("수문지질학")
+                values[r_names.index(r_name)] = values[r_names.index(r_name)] * 100
 
         
-
-        r_names = [os.path.basename(raster_path).split('.')[0] for raster_path in raster_file_paths]
+        print(ko_env_name)
         
-        print(values)
+        
 
         pred_class = None
         str_val1 = None
@@ -97,10 +108,9 @@ def process_coordinates():
                 pred_class = '안전지대'  
 
             # print(pred_class)
-
             # Create a bar chart and convert it to base64 for embedding in HTML
-            chart_img = create_bar_chart(r_names, values)
-            chart_base64 = base64.b64encode(chart_img.getvalue()).decode('utf-8')
+            # chart_img = create_bar_chart(r_names, values)
+            # chart_base64 = base64.b64encode(chart_img.getvalue()).decode('utf-8')
 
         return jsonify({'chart_base64': chart_base64, 'results': pred_class, 'pred_val' :  str_val1, 'env_name':r_names, 'env_val':values})
 

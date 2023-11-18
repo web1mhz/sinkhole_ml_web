@@ -17,3 +17,13 @@ a{
     font-weight: 700;      
 }
 
+
+.coord_result{
+    display: flex;
+    align-items: center;
+    
+    justify-content: space-around;
+    
+   
+}
+
