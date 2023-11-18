@@ -19,9 +19,37 @@ a{
 
 
 .coord_result{
+
     display: flex;
     align-items: center;    
     justify-content: space-around;
    
 }
+
+
+
+@media (max-width: 600px) {
+    .resp {
+      font-size: 20px;
+    }
+    .resp1 {
+        font-size: 8px;        
+       
+     }
+    .coord_result{
+        display: block;
+        margin-top: 20px;
+    }
+    
+
+    div.card-header.myfont{
+        height: 80px;
+    }  
+    
+    .backg{
+        width: 100%;
+        height: 500px;
+    }
+    
+  }
 

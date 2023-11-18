@@ -12,7 +12,7 @@
     .backg {
                 
                 width: 100%;
-                /* height:500px; */
+                height:500px;
                 background-image: linear-gradient(rgba(0,0,0, 0.3), rgba(0,0,0,0.3)), url('../static/data/img_data/sinkhole_img.jpeg');                
                 background-size: cover;
                 background-position: center; 
@@ -90,14 +90,17 @@
                 <!-- <div class="col-md-6">           
                         <div id="chart" class="backg" ></div>    
                 </div>  -->
-                <div class="col-md-6 d-flex align-middle backg">
-                    <canvas  id="myChart" style="width: 100%;height: 500px;"></canvas>
+                <div class="col-md-6 ">
+                    <canvas  id="myChart" class="backg" style="width: 100%; height: 500px;"></canvas>
                 </div>                
             </div>
 
+
+            </div>
+
             <div class="card mt-1">
-                <div class="card-header myfont" style="height: 50px;">
-                    <p class="align-middle" style="font-size:1.2rem">[예측 결과]: 서울특별시 경계지도에서 마우스로 지점을 선택하세요.</p>
+                <div class="card-header myfont" >
+                    <p class="align-middle resp1" style="font-size:1.2rem">[예측 결과]: 서울특별시 경계지도에서 마우스로 지점을 선택하세요.</p>
                 </div>
 
                 <button  id="loading" class="btn btn-warning" type="button" disabled style="display: none;">
@@ -108,8 +111,7 @@
                 <div class="coord_result">
                     <div id ="coord" ></div>  
                     <div id= "result"> </div>
-                </div>
-                              
+                </div>                              
             </div> 
         </div>   
     </section>
@@ -286,15 +288,15 @@
                         
 
                         if (response.results !==null && response.results == "1등급"){                        
-                            $('#result').html('<div ><span class="badge badge-danger">위험</span><h3>씽크홀 발생위험 ' +  response.results + ', 발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                            $('#result').html('<div ><span class="badge badge-danger">위험</span><h3 class="resp">씽크홀 발생위험 ' +  response.results + ', 발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                         } else if (response.results !==null && response.results == "2등급") {                       
-                            $('#result').html('<div ><span class="badge badge-warning">경고</span><h3>씽크홀 발생위험 ' +  response.results + ', 발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                            $('#result').html('<div ><span class="badge badge-warning">경고</span><h3 class="resp">씽크홀 발생위험 ' +  response.results + ', 발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                         } else if (response.results !==null && response.results == "3등급"){
-                            $('#result').html('<div ><span class="badge badge-info">주의</span><h3>씽크홀 발생위험 ' +  response.results + ', 발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                            $('#result').html('<div ><span class="badge badge-info">주의</span><h3 class="resp">씽크홀 발생위험 ' +  response.results + ', 발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                         } else if (response.results !==null && response.results == "안전지대"){
-                            $('#result').html('<div ><span class="badge badge-success">관심</span><h3>씽크홀 발생위험 안전지대'+ ', 발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
+                            $('#result').html('<div ><span class="badge badge-success">관심</span><h3 class="resp">씽크홀 발생위험 안전지대'+ ', 발생위험확률(' + response.pred_val + ')입니다.</h3></div>');
                         } else {
-                            $('#result').html('<div><span class="badge badge-success">지점오류</span><h3>선택한 지점은 서울시 경계를 벗어났거나 한강입니다. 다시 선택하세요.</h3></div>');
+                            $('#result').html('<div><span class="badge badge-success">지점오류</span><h3 class="resp">선택한 지점은 서울시 경계를 벗어났거나 한강입니다. 다시 선택하세요.</h3></div>');
                         }
 
 
@@ -309,7 +311,7 @@
                        //     $('#chart').html('<p>선택된 지점은 서울특별시 경계를 벗어났습니다. 다시 선택하세요.</p>');
                        // }
 
-                        $('#coord').html('<div><span class="badge badge-success">선택지점</span><h3>선택된 지점은 경도: '+  longitude + ' 위도: ' +  latitude +'</h3></div>');
+                        $('#coord').html('<div><span class="badge badge-success">선택지점</span><h3 class="resp">선택된 지점은 경도: '+  longitude + ' 위도: ' +  latitude +'</h3></div>');
                         
                         // console.log(e.coord)                    
                         myChart.update();
