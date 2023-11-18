@@ -97,7 +97,7 @@
 
             <div class="card mt-1">
                 <div class="card-header myfont" style="height: 50px;">
-                    <p class="align-middle">예측 결과: 서울특별시 경계지도에서 마우스로 지점을 선택하세요.</p>
+                    <p class="align-middle" style="font-size:1.2rem">[예측 결과]: 서울특별시 경계지도에서 마우스로 지점을 선택하세요.</p>
                 </div>
 
                 <button  id="loading" class="btn btn-warning" type="button" disabled style="display: none;">
@@ -510,7 +510,7 @@
                 // ].join('\n'));
 
                 infoWindow.setContent([                                       
-                    '<div class="alert alert-primary">예측하기 버튼을 누르세요',                    
+                    '<div class="alert alert-primary myfont">예측하기 버튼을 누르세요',                    
                     '</div>'
                 ].join(''));
                
@@ -713,6 +713,7 @@
             labels: ['사면향', '해발고도', '유출지하수','수문지질', '도로밀도', '경사', '수계에서거리','역사유출지하수', '지하철노선', '지하차도'],
 
             datasets: [{
+
                 label: '환경변수',
                 data: chart_env_val,
                 backgroundColor: 'rgba(255, 255, 255,0.6)',
@@ -722,21 +723,17 @@
             }]
         },
         options: {
-            indexAxis: 'y',
-            legend: {
-                labels: {
-                    fontColor: "white",
-                    fontSize: 18
-                }
-            },
+            
+            indexAxis: 'y',           
+            
             scales: {
                 y: {
                     ticks: { color: 'white', beginAtZero: true}
                 },
                 x: {
-                    ticks: { color: 'white', beginAtZero: true }
+                    ticks: { color: 'white', beginAtZero: true },                    
                 }
-            }            
+            } ,                     
         }
     });
 
